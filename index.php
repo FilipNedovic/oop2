@@ -54,28 +54,37 @@
     }
 
     class Pacijent extends Osoba {
-        public $brojKartona;
+        public static $brojac = 1;
+        public $brojKartona = 1;
 
         public function __construct($ime, $jmbg) {
             parent::__construct($ime, $jmbg);
+            $this->brojKartona = self::$brojac++;
         }
     }
 
     abstract class Pregled {
+        public $doktor;
+        public $pacijent;
         public $tipPregleda;
         public $vreme;
-        public $nalazi = [];
-        public $pacijent;
-        public $doktor;
 
-        public function __construct(Doktor $doktor, Pacijent $pacijent, $tipPregleda, $vreme) {
-            $this->tipPregleda = $tipPregleda;
-            $this->vreme = $vreme;
-            $this->pacijent = $pacijent;
+        public $nalazi = [];
+
+        public function __construct(Doktor $doktor, Pacijent $pacijent, $tipPregleda) {
             $this->doktor = $doktor;
+            $this->pacijent = $pacijent;
+            $this->tipPregleda = $tipPregleda;
+            $this->vreme = $this->setVreme();
         }
 
         public abstract function uradiNalaze() : Nalaz;
+
+        public function setVreme() {
+            $vreme = date('Y-m-d h:i:sa');
+
+            return $this->vreme = $vreme;
+        }
     }
 
     class PregledKrvi extends Pregled {
@@ -86,20 +95,41 @@
 
         public $nalazi = [];
 
-        public function __construct(Doktor $doktor, Pacijent $pacijent, $tipPregleda, $vreme) {
-            parent::__construct($doktor, $pacijent, $tipPregleda, $vreme);
+        public function __construct(Doktor $doktor, Pacijent $pacijent, $tipPregleda) {
+            parent::__construct($doktor, $pacijent, $tipPregleda);
             $this->eritrociti = rand(3.7, 5.8);
             $this->leukociti = rand(4.1, 10.9);
             $this->trombociti = rand(150, 400);
             $this->hemoglobin = rand(115, 170);
+            $this->vreme = $this->setVreme();
         }
 
         public function uradiNalaze(): Nalaz {
             foreach($this as $key => $value) {
                 array_push($this->nalazi, $key, $value);
             }
-            array_splice($this->nalazi, 4);
+            // uzimanje potrebnih propertija iz niza
+            array_splice($this->nalazi, 8);
 
+
+            // formatiranje prikaza
+            $keys = [];
+            $values = [];
+            $i = 0;
+
+            foreach($this->nalazi as $key => $value) {
+                if($i % 2 === 0) {
+                    $keys[$key] =  $value;
+                } else {
+                    $values[$key] = $value;
+                }
+
+                $i++;
+            }
+            $this->nalazi = array_combine($keys, $values);
+
+            
+            // kreiranje novog objekta
             $nalaz = new Nalaz();
             $nalaz->rezultati[] = $this->nalazi;
 
@@ -111,10 +141,11 @@
         public $gornjaVrednost;
         public $donjaVrednost;
 
-        public function __construct(Doktor $doktor, Pacijent $pacijent, $tipPregleda, $vreme) {
-            parent::__construct($doktor, $pacijent, $tipPregleda, $vreme);
+        public function __construct(Doktor $doktor, Pacijent $pacijent, $tipPregleda) {
+            parent::__construct($doktor, $pacijent, $tipPregleda);
             $this->gornjaVrednost = rand(80, 180);
             $this->donjaVrednost = rand(50, 110);
+            $this->vreme = $this->setVreme();
         }
 
         public function uradiNalaze(): Nalaz {
@@ -122,6 +153,22 @@
                 array_push($this->nalazi, $key, $value);
             }
             array_splice($this->nalazi, 4);
+
+
+            $keys = [];
+            $values = [];
+            $i = 0;
+
+            foreach($this->nalazi as $key => $value) {
+                if($i % 2 === 0) {
+                    $keys[$key] =  $value;
+                } else {
+                    $values[$key] = $value;
+                }
+
+                $i++;
+            }
+            $this->nalazi = array_combine($keys, $values);
 
             $nalaz = new Nalaz();
             $nalaz->rezultati[] = $this->nalazi;
@@ -137,9 +184,10 @@
         public $nalazi = [];
 
 
-        public function __construct(Doktor $doktor, Pacijent $pacijent, $tipPregleda, $vreme ) {
-            parent::__construct($doktor, $pacijent, $tipPregleda, $vreme);
+        public function __construct(Doktor $doktor, Pacijent $pacijent, $tipPregleda) {
+            parent::__construct($doktor, $pacijent, $tipPregleda);
             $this->vrednost = rand(2, 8);
+            $this->vreme = $this->setVreme();
         }
 
         public function uradiNalaze(): Nalaz {
@@ -147,6 +195,24 @@
                 array_push($this->nalazi, $key, $value);
             }
             array_splice($this->nalazi, 2);
+
+
+            $keys = [];
+            $values = [];
+            $i = 0;
+
+            foreach($this->nalazi as $key => $value) {
+                if($i % 2 === 0) {
+                    $keys[$key] =  $value;
+                } else {
+                    $values[$key] = $value;
+                }
+
+                $i++;
+            }
+            $this->nalazi = array_combine($keys, $values);
+            var_dump($this->nalazi);
+
 
             $nalaz = new Nalaz();
             $nalaz->rezultati = $this->nalazi;
@@ -165,24 +231,27 @@
         }
     }
 
-    class Recept {}
+    class Recept {
+        public $doktor;
+    }
 
     class Loger {}
 
+
+    $bolnica = new Bolnica('Bolnica Sv. Spasa', 'Vrbas');
+
     $doktor = new Doktor('Dr Peric', '0923382776611', 'pedijatar');
     $pacijent = new Pacijent('Mile', '9928477401829');
+    $pacijent1 = new Pacijent('Mile', '9928477401829');
 
-    $pregled1 = new PregledKrvi($doktor, $pacijent, 'analiza krvne slike', 'sad');
-    $pregled2 = new PregledPritiska($doktor, $pacijent, 'analiza krvne slike', 'sad');
-    $pregled3 = new PregledHolesterola($doktor, $pacijent, 'analiza krvne slike', 'sad');
+    $pregled1 = new PregledKrvi($doktor, $pacijent, 'analiza krvne slike');
+    $pregled2 = new PregledPritiska($doktor, $pacijent, 'merenje pritiska');
+    $pregled3 = new PregledHolesterola($doktor, $pacijent, 'merenje nivoa holesterola');
 
-    $pregled3->uradiNalaze();
+    $pregled1->uradiNalaze();
 
-    // $bolnica = new Bolnica('Bolnica Sv. Spasa', 'Vrbas');
-    // var_dump($bolnica);
+    
 
-    // $djina = new Pacijent('Miro', '9283748100288');
-    // $pregledPritiska = new PregledPritiska('pregled pritiska', 'sutra',);
-    // var_dump($pregledPritiska);
+
 ?>
 
