@@ -9,11 +9,24 @@
         public function __construct($ime, $adresa) {
             $this->ime = $ime;
             $this->adresa = $adresa;
-            $this->dodajOdeljenja($this->odeljenja);
+            $this->dodajOdeljenja();
         }
 
         public function dodajOdeljenja() {
-            
+            // kreiranje objekta kao model da bi se pristupilo propertijima
+            $objekatOdeljenje = new Odeljenje();
+            $imenaOdeljenja = ['Hirurgija', 'Intenzivna nega', 'Laboratorija', 'Kardiologija'];
+
+            // dodavanje vrednosti propertijima i instanciranje odredjenog broja objekata
+            foreach($imenaOdeljenja as $value) {
+                if($objekatOdeljenje::$brojac <= count($imenaOdeljenja)) {
+                    $odeljenje = new Odeljenje();
+                    $odeljenje->imeOdeljenja = $value;
+
+                    // dodavanje objekata u niz
+                    $this->odeljenja[] = $odeljenje;
+                }
+            }
         }
 
         public function dodajDoktora(Doktor $doktor) {
@@ -22,15 +35,13 @@
     }
 
     class Odeljenje {
-        public static $brojac = 1;
-        public $brojOdeljenja;
-        private $imenaOdeljenja = ['Hirurgija', 'Intenzivna nega', 'Laboratorija', 'Kardiologija'];
+        public static $brojac = 0;
 
         public $imeOdeljenja;
+        public $brojOdeljenja;
 
         public function __construct() {
             $this->brojOdeljenja = self::$brojac++;
-            $this->imeOdeljenja = $this->imenaOdeljenja[self::$brojac - 2];
         }
     }
     
@@ -235,14 +246,18 @@
     $bolnica = new Bolnica('Bolnica Sv. Spasa', 'Vrbas');
 
     $doktor = new Doktor('Dr Peric', '0923382776611', 'pedijatar');
-    $pacijent = new Pacijent('Mile', '9928477401829');
-    $pacijent1 = new Pacijent('Mile', '9928477401829');
+    $bolnica->dodajDoktora($doktor);
 
-    $pregled1 = new PregledKrvi($doktor, $pacijent, 'analiza krvne slike');
-    $pregled2 = new PregledPritiska($doktor, $pacijent, 'merenje pritiska');
-    $pregled3 = new PregledHolesterola($doktor, $pacijent, 'merenje nivoa holesterola');
+    $pacijent1 = new Pacijent('Mile', '9928477401829');
+    $pacijent2 = new Pacijent('Grile', '9328710404529');
+
+    $pregled1 = new PregledKrvi($doktor, $pacijent1, 'analiza krvne slike');
+    $pregled2 = new PregledPritiska($doktor, $pacijent1, 'merenje pritiska');
+    $pregled3 = new PregledHolesterola($doktor, $pacijent1, 'merenje nivoa holesterola');
 
     $pregled1->uradiNalaze();
+
+    var_dump($bolnica);
 
     
 
