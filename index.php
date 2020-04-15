@@ -93,8 +93,6 @@
         public $trombociti;
         public $hemoglobin;
 
-        public $nalazi = [];
-
         public function __construct(Doktor $doktor, Pacijent $pacijent, $tipPregleda) {
             parent::__construct($doktor, $pacijent, $tipPregleda);
             $this->eritrociti = rand(3.7, 5.8);
@@ -128,7 +126,7 @@
             }
             $this->nalazi = array_combine($keys, $values);
 
-            
+
             // kreiranje novog objekta
             $nalaz = new Nalaz();
             $nalaz->rezultati[] = $this->nalazi;
@@ -181,9 +179,6 @@
     class PregledHolesterola extends Pregled {
         public $vrednost;
 
-        public $nalazi = [];
-
-
         public function __construct(Doktor $doktor, Pacijent $pacijent, $tipPregleda) {
             parent::__construct($doktor, $pacijent, $tipPregleda);
             $this->vrednost = rand(2, 8);
@@ -211,7 +206,6 @@
                 $i++;
             }
             $this->nalazi = array_combine($keys, $values);
-            var_dump($this->nalazi);
 
 
             $nalaz = new Nalaz();
