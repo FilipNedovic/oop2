@@ -93,14 +93,10 @@
             $i = 0;
 
             foreach($this->nalazi as $key => $value) {
-                if($i % 2 === 0) {
-                    $keys[$key] =  $value;
-                } else {
-                    $values[$key] = $value;
-                }
-
+                $i % 2 === 0 ? $keys[$key] = $value : $values[$key] = $value;
                 $i++;
             }
+
             $this->nalazi = array_combine($keys, $values);
         }
 
@@ -172,12 +168,12 @@
         public $vrednost;
 
         public function __construct(Doktor $doktor, Pacijent $pacijent, $tipPregleda) {
-            parent::__construct($doktor, $pacijent, $tipPregleda);
-            $this->vrednost = rand(2, 8);
-            $this->vreme = $this->setVreme();
+            parent::__construct($doktor, $pacijent, $tipPregleda, $this->setVreme());
         }
 
         public function uradiNalaze(): Nalaz {
+            $this->vrednost = rand(2, 8);
+            
             foreach($this as $key => $value) {
                 array_push($this->nalazi, $key, $value);
             }
@@ -222,7 +218,6 @@
 
     $pregled3->uradiNalaze();
 
-    var_dump($pregled3);
 
     
 
